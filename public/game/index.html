@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+    <title>TRAFFIC RUSH — Endless Traffic Dodging Arcade Game</title>
+    <meta
+      name="description"
+      content="TRAFFIC RUSH: a fast top-down highway dodging arcade game. Weave through traffic, chain near misses and beat your best score."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Orbitron:wght@700;900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <canvas id="game"></canvas>
+    <div id="mirror-tint" class="mirror-tint hidden"></div>
+
+    <!-- HUD -->
+    <div id="hud" class="hidden">
+      <div class="hud-row">
+        <div class="stat"><span class="k">SCORE</span><span class="v" id="hud-score">0</span></div>
+        <div class="stat"><span class="k">BEST</span><span class="v" id="hud-best">0</span></div>
+      </div>
+      <div class="hud-row right">
+        <div class="stat"><span class="k">SPEED</span><span class="v"><b id="hud-speed">0</b> km/h</span></div>
+        <div class="stat"><span class="k">DISTANCE</span><span class="v"><b id="hud-distance">0.00</b> km</span></div>
+        <div class="stat"><span class="k">WEATHER</span><span class="v" id="weather-tag">Day</span></div>
+        <div class="stat"><span class="k">COINS</span><span class="v" id="hud-coins">0</span></div>
+        <div class="stat"><span class="k">NITRO</span><span class="v" id="hud-nitro">0</span></div>
+      </div>
+      <div id="rain-note" class="rain-note hidden">🌧 RAIN — BRAKING -15%</div>
+      <div id="hud-combo" class="combo hidden">×2</div>
+      <div id="event-banner" class="banner hidden"></div>
+      <div id="nitro-bar" class="nitro-bar hidden"><i></i></div>
+      <div id="ghost-hud" class="ghost-hud hidden">
+        <span class="ghost-title">👻 BEAT YOUR GHOST</span>
+        <span class="ghost-delta" id="ghost-delta">🟢 +0m AHEAD</span>
+      </div>
+      <div id="mirror-hud" class="mirror-hud hidden">
+        <span class="mirror-title">🪞 MIRROR MODE</span>
+        <span class="mirror-sub">STEERING REVERSED · <b id="mirror-count">10</b>s</span>
+      </div>
+      <div id="warn-left" class="rear-warn left hidden"><span class="arrow">← 🚨</span><span class="txt">FAST CAR APPROACHING</span></div>
+      <div id="warn-right" class="rear-warn right hidden"><span class="arrow">🚨 →</span><span class="txt">FAST CAR APPROACHING</span></div>
+      <div class="hint">ESC — quit &nbsp;·&nbsp; P / SPACE — pause &nbsp;·&nbsp; MIDDLE CLICK — fire (20 coins) &nbsp;·&nbsp; DOUBLE-CLICK ACCELERATE — nitro</div>
+    </div>
+
+    <!-- MOBILE CONTROLS -->
+    <div id="mobile-pad" class="mobile-pad hidden">
+      <div id="touch-steer" class="touch-steer"></div>
+      <div class="pad-left">
+        <button id="btn-brake-touch" class="pad-btn brake">BRAKE</button>
+      </div>
+      <div class="pad-right">
+        <button id="btn-nitro-touch" class="pad-btn nitro">NITRO</button>
+        <button id="btn-accel-touch" class="pad-btn accel">GO</button>
+      </div>
+      <button id="btn-calibrate" class="pad-cal">RECALIBRATE TILT</button>
+    </div>
+
+    <!-- MENU -->
+    <div id="menu" class="screen">
+      <div class="panel">
+        <h1 class="logo">TRAFFIC<span>RUSH</span></h1>
+        <p class="tagline">How long can you survive?</p>
+        <div class="best-line">BEST SCORE <b id="menu-best">0</b></div>
+        <div class="buttons">
+          <button id="btn-play" class="btn primary">PLAY</button>
+          <button id="btn-controls" class="btn">CONTROLS</button>
+          <button id="btn-settings" class="btn">SETTINGS</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTROLS -->
+    <div id="controls-screen" class="screen hidden">
+      <div class="panel">
+        <h2>CONTROLS</h2>
+        <h3 class="mode-head">INNOVATIVE MODE ⭐ <em id="mode-tag-innovative" class="mode-tag hidden">ACTIVE</em></h3>
+        <ul class="list">
+          <li><b data-accel-btn>Hold Left Click</b><span>Accelerate</span></li>
+          <li><b data-brake-btn>Hold Right Click</b><span>Brake</span></li>
+          <li><b>Scroll Up</b><span data-scroll-up>Move left</span></li>
+          <li><b>Scroll Down</b><span data-scroll-down>Move right</span></li>
+          <li><b data-nitro-btn>Double Left Click</b><span>Activate nitro</span></li>
+          <li><b>Middle Click (scroll wheel)</b><span>Fire coin round — 20 coins</span></li>
+        </ul>
+        <h3 class="mode-head">📱 MOBILE MODE <em id="mode-tag-mobile" class="mode-tag hidden">ACTIVE</em></h3>
+        <ul class="list">
+          <li><b>Tilt phone left / right</b><span>Steer proportionally (auto-calibrated on start)</span></li>
+          <li><b>Swipe on the road</b><span>Fallback steering if tilt is unavailable</span></li>
+          <li><b>GO / BRAKE buttons</b><span>Accelerate &amp; brake</span></li>
+          <li><b>NITRO button</b><span>Activate nitro</span></li>
+        </ul>
+        <h3 class="mode-head">STANDARD MODE <em id="mode-tag-standard" class="mode-tag hidden">ACTIVE</em></h3>
+        <ul class="list">
+          <li><b>W / ↑</b><span>Accelerate</span></li>
+          <li><b>S / ↓</b><span>Brake</span></li>
+          <li><b>A / ←</b><span>Move left</span></li>
+          <li><b>D / →</b><span>Move right</span></li>
+          <li><b>Middle Click / Double Right Click</b><span>Fire round / nitro</span></li>
+        </ul>
+        <ul class="list">
+          <li><b>ESC</b><span>Quit to menu</span></li>
+          <li><b>P / SPACE</b><span>Pause &amp; resume</span></li>
+          <li><b>👻 Ghost Rival</b><span>Race the replay of your best run</span></li>
+          <li><b>🪞 Mirror Mode</b><span>Steering reverses for 10s — pedals unchanged</span></li>
+          <li><b>🚨 Rear warning</b><span>Arrow shows fast traffic closing from behind</span></li>
+        </ul>
+        <p class="note">
+          Pick your scheme in SETTINGS. Innovative Mode is the default mouse-only experience;
+          Standard Mode is the keyboard equivalent — same physics, same speed, same challenge.
+          Skim past traffic for NEAR MISS bonuses — chain them for ×2, ×3, ×4 multipliers. Collect
+          coins and nitro canisters on the road: nitro gives a timed speed burst, and 20 coins load
+          one cannon round that bursts every vehicle straight ahead.
+        </p>
+        <button class="btn" data-back>BACK</button>
+      </div>
+    </div>
+
+
+    <!-- SETTINGS -->
+    <div id="settings-screen" class="screen hidden">
+      <div class="panel">
+        <h2>SETTINGS</h2>
+        <label class="field">
+          <span>Control mode</span>
+          <select id="mode-toggle">
+            <option value="innovative">Innovative Mode ⭐ (mouse only)</option>
+            <option value="standard">Standard Mode (keyboard WASD / arrows)</option>
+            <option value="mobile">📱 Mobile Mode (tilt + touch buttons)</option>
+          </select>
+        </label>
+        <label class="field">
+          <span>Steering hand (scroll only)</span>
+          <select id="hand-toggle">
+            <option value="right">Right-handed</option>
+            <option value="left">Left-handed</option>
+          </select>
+        </label>
+        <label class="field" id="sens-field">
+          <span>Scroll sensitivity</span>
+          <input id="scroll-sens" type="range" min="1" max="10" step="1" />
+          <em id="scroll-sens-val">5</em>
+        </label>
+
+        <label class="field">
+          <span>Master volume</span>
+          <input id="vol-master" type="range" min="0" max="100" />
+          <em id="vol-master-val">80%</em>
+        </label>
+        <label class="field">
+          <span>SFX volume</span>
+          <input id="vol-sfx" type="range" min="0" max="100" />
+          <em id="vol-sfx-val">90%</em>
+        </label>
+        <label class="field">
+          <span>Music volume</span>
+          <input id="vol-music" type="range" min="0" max="100" />
+          <em id="vol-music-val">50%</em>
+        </label>
+        <button class="btn" data-back>BACK</button>
+      </div>
+    </div>
+
+    <!-- FULLSCREEN REQUIREMENT -->
+    <div id="fullscreen-screen" class="screen hidden">
+      <div class="panel">
+        <h2>FULLSCREEN REQUIRED</h2>
+        <p class="note">
+          Traffic Rush takes over the mouse buttons and scroll wheel, so it can only be played in
+          fullscreen. Press ENTER FULLSCREEN to start — press <b>ESC</b> any time to quit back to the
+          menu.
+        </p>
+        <div class="buttons">
+          <button id="btn-fullscreen" class="btn primary">ENTER FULLSCREEN &amp; PLAY</button>
+          <button class="btn" data-back>BACK</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- READY -->
+    <div id="ready-screen" class="screen transparent hidden"></div>
+
+    <!-- PAUSE -->
+    <div id="pause-screen" class="screen hidden">
+      <div class="panel">
+        <h2>PAUSED</h2>
+        <div class="buttons">
+          <button id="btn-resume" class="btn primary">RESUME</button>
+          <button id="btn-quit" class="btn">QUIT TO MENU</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- GAME OVER -->
+    <div id="gameover-screen" class="screen hidden">
+      <div class="panel">
+        <h2 class="crashed">CRASHED</h2>
+        <div id="go-record" class="record hidden">NEW RECORD!</div>
+        <div class="results">
+          <div><span>Distance</span><b id="go-distance">0.00 km</b></div>
+          <div><span>Score</span><b id="go-score">0</b></div>
+          <div><span>Near misses</span><b id="go-near">0</b></div>
+          <div><span>Best combo</span><b id="go-combo">×0</b></div>
+          <div><span>Best score</span><b id="go-best">0</b></div>
+        </div>
+        <div class="buttons">
+          <button id="btn-again" class="btn primary">PLAY AGAIN</button>
+          <button id="btn-menu" class="btn">MENU</button>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="./game.js"></script>
+  </body>
+</html>
