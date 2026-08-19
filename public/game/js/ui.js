@@ -3,7 +3,7 @@ import { STORAGE_KEYS } from "../config.js";
 const DEFAULTS = {
   handedness: "right",
   controlMode: "innovative",
-  scrollSensitivity: 5,
+  scrollSensitivity: 6,
   master: 0.8,
   sfx: 0.9,
   music: 0.5,
