@@ -161,6 +161,27 @@ export class AudioEngine {
     this.stopMusic();
   }
 
+  // Hard mute: kills every layer instantly and blocks new sounds until unmute().
+  hardMute() {
+    this.muted = true;
+    if (!this.ready) return;
+    const t = this.ctx.currentTime;
+    for (const g of [this.engineGain, this.rushGain, this.padGain, this.melodyGain]) {
+      if (!g) continue;
+      g.gain.cancelScheduledValues(t);
+      g.gain.setValueAtTime(0, t);
+    }
+    this.stopMusic();
+    this.master.gain.cancelScheduledValues(t);
+    this.master.gain.setValueAtTime(0, t);
+  }
+
+  unmute() {
+    this.muted = false;
+    if (!this.ready) return;
+    this.applyVolumes();
+  }
+
   _makeNoise() {
     const len = this.ctx.sampleRate * 1.2;
     const buf = this.ctx.createBuffer(1, len, this.ctx.sampleRate);
