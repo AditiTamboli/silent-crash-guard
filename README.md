@@ -1,4 +1,5 @@
 # 🖱️ MouseRush: Traffic Racer
+deployed link - https://silent-crash-guard.vercel.app
 
 A fast, top-down **endless traffic-dodging arcade game** built for the browser. Weave through five lanes of rush-hour traffic, chain near-misses for combo multipliers, grab nitro and coins, and chase your best score — all driven entirely by a single mouse.
 
@@ -98,7 +99,6 @@ The game is fully static and can be deployed anywhere:
 - **GitHub Pages** — push `public/` (or the built output) to the `gh-pages` branch.
 - **Netlify / Vercel** — connect the repo and deploy; no special config needed.
 - **Any static host** — serve the contents of `public/`.
-
 ---
 
 Built with **[Lovable](https://lovable.dev)**.
