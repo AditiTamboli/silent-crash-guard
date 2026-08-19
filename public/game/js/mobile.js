@@ -20,8 +20,11 @@ export class MobileInput {
     this.enabled = false;
     this.source = "none"; // "tilt" | "touch"
     this.raw = 0;
+    this.rawSmooth = 0;
     this.neutral = 0;
     this.tilt = 0;
+    this.out = 0;
+    this.lastT = 0;
     this.touchStartX = null;
     this.touchTilt = 0;
     this.pad = null;
@@ -36,6 +39,7 @@ export class MobileInput {
         this.calibrate();
       }
     };
+
   }
 
   mount() {
