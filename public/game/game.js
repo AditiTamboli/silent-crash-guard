@@ -309,6 +309,7 @@ class Game {
 
   setState(next) {
     this.state = next;
+    if (next !== STATE.CRASH) this.audio.unmute();
     const playing = next === STATE.PLAYING;
     this.controls.setActive(playing || next === STATE.READY);
     // Steering direction must always match the live Mirror Mode state.
@@ -710,6 +711,7 @@ class Game {
   crash(v) {
     this.audio.setEngine(false, 0, "idle");
     this.audio.silence();
+    this.audio.hardMute();
     // Sound is fully off after a crash — no crash SFX, no music.
     this.shake = 26;
     this.crashTimer = 1.1;

@@ -125,6 +125,7 @@ export class AudioEngine {
   }
 
   startMusic() {
+    if (this.muted) return;
     if (!this.ready || this.melodyTimer) return;
     // A minor pentatonic, gentle and non-intrusive.
     const scale = [220, 261.63, 293.66, 329.63, 392, 440, 523.25, 587.33];
@@ -161,6 +162,27 @@ export class AudioEngine {
     this.stopMusic();
   }
 
+  // Hard mute: kills every layer instantly and blocks new sounds until unmute().
+  hardMute() {
+    this.muted = true;
+    if (!this.ready) return;
+    const t = this.ctx.currentTime;
+    for (const g of [this.engineGain, this.rushGain, this.padGain, this.melodyGain]) {
+      if (!g) continue;
+      g.gain.cancelScheduledValues(t);
+      g.gain.setValueAtTime(0, t);
+    }
+    this.stopMusic();
+    this.master.gain.cancelScheduledValues(t);
+    this.master.gain.setValueAtTime(0, t);
+  }
+
+  unmute() {
+    this.muted = false;
+    if (!this.ready) return;
+    this.applyVolumes();
+  }
+
   _makeNoise() {
     const len = this.ctx.sampleRate * 1.2;
     const buf = this.ctx.createBuffer(1, len, this.ctx.sampleRate);
@@ -184,7 +206,7 @@ export class AudioEngine {
   // mode: "accel" | "brake" | "coast" | "idle". Sound is produced only while
   // the player is accelerating, lifting off (decelerating) or braking.
   setEngine(active, speed = 0, mode = "idle") {
-    if (!this.ready) return;
+    if (!this.ready || this.muted) return;
     const t = this.ctx.currentTime;
     const spd = Math.max(0, Math.min(1, speed / 275));
 
@@ -221,7 +243,7 @@ export class AudioEngine {
   }
 
   _noise(duration, filterType, freq, gain, sweep) {
-    if (!this.ready) return;
+    if (!this.ready || this.muted) return;
     const t = this.ctx.currentTime;
     const src = this.ctx.createBufferSource();
     src.buffer = this.noiseBuffer;
@@ -240,7 +262,7 @@ export class AudioEngine {
   }
 
   _tone(freq, duration, type = "sine", gain = 0.18, to) {
-    if (!this.ready) return;
+    if (!this.ready || this.muted) return;
     const t = this.ctx.currentTime;
     const o = this.ctx.createOscillator();
     o.type = type;
