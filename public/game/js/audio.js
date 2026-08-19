@@ -125,6 +125,7 @@ export class AudioEngine {
   }
 
   startMusic() {
+    if (this.muted) return;
     if (!this.ready || this.melodyTimer) return;
     // A minor pentatonic, gentle and non-intrusive.
     const scale = [220, 261.63, 293.66, 329.63, 392, 440, 523.25, 587.33];
@@ -205,7 +206,7 @@ export class AudioEngine {
   // mode: "accel" | "brake" | "coast" | "idle". Sound is produced only while
   // the player is accelerating, lifting off (decelerating) or braking.
   setEngine(active, speed = 0, mode = "idle") {
-    if (!this.ready) return;
+    if (!this.ready || this.muted) return;
     const t = this.ctx.currentTime;
     const spd = Math.max(0, Math.min(1, speed / 275));
 
@@ -242,7 +243,7 @@ export class AudioEngine {
   }
 
   _noise(duration, filterType, freq, gain, sweep) {
-    if (!this.ready) return;
+    if (!this.ready || this.muted) return;
     const t = this.ctx.currentTime;
     const src = this.ctx.createBufferSource();
     src.buffer = this.noiseBuffer;
@@ -261,7 +262,7 @@ export class AudioEngine {
   }
 
   _tone(freq, duration, type = "sine", gain = 0.18, to) {
-    if (!this.ready) return;
+    if (!this.ready || this.muted) return;
     const t = this.ctx.currentTime;
     const o = this.ctx.createOscillator();
     o.type = type;
