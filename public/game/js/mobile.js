@@ -1,8 +1,11 @@
 // Mobile mode: tilt steering (with calibration + dead zone), touch/swipe
 // fallback and on-screen ACCELERATE / BRAKE buttons.
-const DEAD_ZONE = 0.08; // fraction of the tilt range ignored around neutral
-const MAX_TILT_DEG = 26; // tilt angle that maps to full steering
+const DEAD_ZONE = 0.06; // fraction of the tilt range ignored around neutral
+const MAX_TILT_DEG = 30; // tilt angle that maps to full steering
 const SWIPE_RANGE = 110; // px of horizontal drag that maps to full steering
+const RAW_SMOOTH_HZ = 9; // low-pass on noisy sensor readings
+const OUT_SMOOTH_HZ = 7; // low-pass on the final steering value
+
 
 export function isTouchDevice() {
   return (
