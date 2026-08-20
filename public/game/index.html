@@ -90,13 +90,20 @@
           <li><b data-nitro-btn>Double Left Click</b><span>Activate nitro</span></li>
           <li><b>Middle Click (scroll wheel)</b><span>Fire coin round — 20 coins</span></li>
         </ul>
-        <h3 class="mode-head">📱 MOBILE MODE <em id="mode-tag-mobile" class="mode-tag hidden">ACTIVE</em></h3>
+        <h3 class="mode-head">📱 MOBILE MODE — TILT <em id="mode-tag-mobile" class="mode-tag hidden">ACTIVE</em></h3>
         <ul class="list">
           <li><b>Tilt phone left / right</b><span>Steer proportionally (auto-calibrated on start)</span></li>
           <li><b>Swipe on the road</b><span>Fallback steering if tilt is unavailable</span></li>
           <li><b>GO / BRAKE buttons</b><span>Accelerate &amp; brake</span></li>
           <li><b>NITRO button</b><span>Activate nitro</span></li>
         </ul>
+        <h3 class="mode-head">📱 MOBILE MODE — SWIPE <em id="mode-tag-swipe" class="mode-tag hidden">ACTIVE</em></h3>
+        <ul class="list">
+          <li><b>Swipe right / left on the road</b><span>Steer proportionally — no tilt used</span></li>
+          <li><b>GO / BRAKE buttons</b><span>Accelerate &amp; brake</span></li>
+          <li><b>NITRO button</b><span>Activate nitro</span></li>
+        </ul>
+
         <h3 class="mode-head">STANDARD MODE <em id="mode-tag-standard" class="mode-tag hidden">ACTIVE</em></h3>
         <ul class="list">
           <li><b>W / ↑</b><span>Accelerate</span></li>
@@ -133,7 +140,9 @@
           <select id="mode-toggle">
             <option value="innovative">Innovative Mode ⭐ (mouse only)</option>
             <option value="standard">Standard Mode (keyboard WASD / arrows)</option>
-            <option value="mobile">📱 Mobile Mode (tilt + touch buttons)</option>
+            <option value="mobile">📱 Mobile Mode — Tilt (+ touch buttons)</option>
+            <option value="swipe">📱 Mobile Mode — Swipe (swipe right/left)</option>
+
           </select>
         </label>
         <label class="field">

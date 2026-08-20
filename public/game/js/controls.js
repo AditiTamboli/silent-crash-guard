@@ -180,13 +180,18 @@ export class Controls {
 
   get mode() {
     const m = this.settings.get("controlMode");
-    if (m === "standard" || m === "mobile") return m;
+    if (m === "standard" || m === "mobile" || m === "swipe") return m;
     return "innovative";
   }
 
   get isMobileMode() {
-    return this.mode === "mobile";
+    return this.mode === "mobile" || this.mode === "swipe";
   }
+
+  get isSwipeMode() {
+    return this.mode === "swipe";
+  }
+
 
   static touchDevice() {
     return isTouchDevice();
@@ -243,7 +248,7 @@ export class Controls {
     const mobile = value && this.isMobileMode;
     document.body.classList.toggle("mobile-play", mobile);
     this.mobile.setVisible(mobile);
-    if (mobile) this.mobile.enable();
+    if (mobile) this.mobile.enable({ swipeOnly: this.isSwipeMode });
     else this.mobile.disable();
     if (!value) this.releaseAll();
   }

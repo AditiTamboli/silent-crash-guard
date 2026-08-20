@@ -28,6 +28,8 @@ export class MobileInput {
     this.touchStartX = null;
     this.touchTilt = 0;
     this.pad = null;
+    this.swipeOnly = false;
+
 
     this._onOrientation = (e) => {
       if (e.gamma === null && e.beta === null) return;
@@ -115,10 +117,14 @@ export class MobileInput {
     }
   }
 
-  async enable() {
+  async enable(opts = {}) {
     if (this.enabled) return;
     this.enabled = true;
+    this.swipeOnly = !!opts.swipeOnly;
     this.source = "touch";
+    const cal = document.getElementById("btn-calibrate");
+    if (cal) cal.classList.toggle("hidden", this.swipeOnly);
+    if (this.swipeOnly) return; // swipe-only mode: never listen to tilt
     try {
       const DOE = window.DeviceOrientationEvent;
       if (DOE && typeof DOE.requestPermission === "function") {
@@ -130,6 +136,7 @@ export class MobileInput {
       /* touch fallback */
     }
   }
+
 
   disable() {
     this.enabled = false;
@@ -166,9 +173,10 @@ export class MobileInput {
     this.rawSmooth += (this.raw - this.rawSmooth) * (1 - Math.exp(-RAW_SMOOTH_HZ * dt));
 
     let v = 0;
-    if (this.source === "tilt") {
+    if (!this.swipeOnly && this.source === "tilt") {
       v = (this.rawSmooth - this.neutral) / MAX_TILT_DEG;
     }
+
     if (Math.abs(this.touchTilt) > Math.abs(v)) v = this.touchTilt;
     v = Math.max(-1, Math.min(1, v));
 
