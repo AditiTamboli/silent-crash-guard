@@ -115,10 +115,14 @@ export class MobileInput {
     }
   }
 
-  async enable() {
+  async enable(opts = {}) {
     if (this.enabled) return;
     this.enabled = true;
+    this.swipeOnly = !!opts.swipeOnly;
     this.source = "touch";
+    const cal = document.getElementById("btn-calibrate");
+    if (cal) cal.classList.toggle("hidden", this.swipeOnly);
+    if (this.swipeOnly) return; // swipe-only mode: never listen to tilt
     try {
       const DOE = window.DeviceOrientationEvent;
       if (DOE && typeof DOE.requestPermission === "function") {
@@ -130,6 +134,7 @@ export class MobileInput {
       /* touch fallback */
     }
   }
+
 
   disable() {
     this.enabled = false;
