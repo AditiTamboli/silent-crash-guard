@@ -171,9 +171,10 @@ export class MobileInput {
     this.rawSmooth += (this.raw - this.rawSmooth) * (1 - Math.exp(-RAW_SMOOTH_HZ * dt));
 
     let v = 0;
-    if (this.source === "tilt") {
+    if (!this.swipeOnly && this.source === "tilt") {
       v = (this.rawSmooth - this.neutral) / MAX_TILT_DEG;
     }
+
     if (Math.abs(this.touchTilt) > Math.abs(v)) v = this.touchTilt;
     v = Math.max(-1, Math.min(1, v));
 
