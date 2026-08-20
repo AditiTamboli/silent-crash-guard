@@ -28,6 +28,8 @@ export class MobileInput {
     this.touchStartX = null;
     this.touchTilt = 0;
     this.pad = null;
+    this.swipeOnly = false;
+
 
     this._onOrientation = (e) => {
       if (e.gamma === null && e.beta === null) return;
