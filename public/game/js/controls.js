@@ -248,7 +248,7 @@ export class Controls {
     const mobile = value && this.isMobileMode;
     document.body.classList.toggle("mobile-play", mobile);
     this.mobile.setVisible(mobile);
-    if (mobile) this.mobile.enable();
+    if (mobile) this.mobile.enable({ swipeOnly: this.isSwipeMode });
     else this.mobile.disable();
     if (!value) this.releaseAll();
   }
