@@ -2,7 +2,7 @@
 // fallback and on-screen ACCELERATE / BRAKE buttons.
 const DEAD_ZONE = 0.06; // fraction of the tilt range ignored around neutral
 const MAX_TILT_DEG = 30; // tilt angle that maps to full steering
-const SWIPE_RANGE = 110; // px of horizontal drag that maps to full steering
+const SWIPE_RANGE = 78; // px of horizontal drag that maps to full steering
 const RAW_SMOOTH_HZ = 9; // low-pass on noisy sensor readings
 const OUT_SMOOTH_HZ = 7; // low-pass on the final steering value
 
@@ -26,6 +26,7 @@ export class MobileInput {
     this.out = 0;
     this.lastT = 0;
     this.touchStartX = null;
+    this.touchId = null;
     this.touchTilt = 0;
     this.pad = null;
     this.swipeOnly = false;
@@ -87,11 +88,20 @@ export class MobileInput {
     // Touch / swipe steering fallback (also usable alongside tilt).
     const surface = document.getElementById("touch-steer");
     if (surface) {
+      const findTouch = (list) => {
+        for (const t of list) if (t.identifier === this.touchId) return t;
+        return null;
+      };
       surface.addEventListener(
         "touchstart",
         (e) => {
           e.preventDefault();
-          this.touchStartX = e.touches[0].clientX;
+          // Track only the finger that started on the steering surface, so the
+          // GO / BRAKE / NITRO buttons can be held with another finger at the same time.
+          if (this.touchId !== null) return;
+          const t = e.changedTouches[0];
+          this.touchId = t.identifier;
+          this.touchStartX = t.clientX;
           this.touchTilt = 0;
         },
         { passive: false },
@@ -99,16 +109,20 @@ export class MobileInput {
       surface.addEventListener(
         "touchmove",
         (e) => {
+          if (this.touchId === null) return;
+          const t = findTouch(e.touches);
+          if (!t) return;
           e.preventDefault();
-          if (this.touchStartX === null) return;
-          const dx = e.touches[0].clientX - this.touchStartX;
+          const dx = t.clientX - this.touchStartX;
           this.touchTilt = Math.max(-1, Math.min(1, dx / SWIPE_RANGE));
           if (this.source !== "tilt") this.source = "touch";
         },
         { passive: false },
       );
       const end = (e) => {
-        e.preventDefault();
+        if (this.touchId === null) return;
+        if (!findTouch(e.changedTouches)) return;
+        this.touchId = null;
         this.touchStartX = null;
         this.touchTilt = 0;
       };
@@ -146,6 +160,7 @@ export class MobileInput {
     this.rawSmooth = this.raw;
     this.touchTilt = 0;
     this.touchStartX = null;
+    this.touchId = null;
     this.lastT = 0;
     window.removeEventListener("deviceorientation", this._onOrientation, true);
   }
