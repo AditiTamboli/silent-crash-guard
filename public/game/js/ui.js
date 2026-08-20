@@ -148,12 +148,25 @@ export class UI {
     $("mode-tag-innovative").classList.toggle("hidden", mode !== "innovative");
     const mobileTag = $("mode-tag-mobile");
     if (mobileTag) mobileTag.classList.toggle("hidden", mode !== "mobile");
+    const swipeTag = $("mode-tag-swipe");
+    if (swipeTag) swipeTag.classList.toggle("hidden", mode !== "swipe");
     $("sens-field").classList.toggle("hidden", mode !== "innovative");
   }
 
   // Lines drawn on the 3-2-1 countdown so the player sees the active scheme.
   controlSummary() {
     const left = this.settings.get("handedness") === "left";
+    if (this.settings.get("controlMode") === "swipe") {
+      return {
+        title: "MOBILE MODE — SWIPE",
+        lines: [
+          "Swipe right / left  Steer",
+          "GO / BRAKE  Pedals",
+          "NITRO  Speed burst",
+          "No tilt used in this mode",
+        ],
+      };
+    }
     if (this.settings.get("controlMode") === "mobile") {
       return {
         title: "MOBILE MODE — TILT",
@@ -165,6 +178,7 @@ export class UI {
         ],
       };
     }
+
     if (this.settings.get("controlMode") === "standard") {
       return {
         title: "STANDARD MODE — KEYBOARD",
