@@ -180,13 +180,18 @@ export class Controls {
 
   get mode() {
     const m = this.settings.get("controlMode");
-    if (m === "standard" || m === "mobile") return m;
+    if (m === "standard" || m === "mobile" || m === "swipe") return m;
     return "innovative";
   }
 
   get isMobileMode() {
-    return this.mode === "mobile";
+    return this.mode === "mobile" || this.mode === "swipe";
   }
+
+  get isSwipeMode() {
+    return this.mode === "swipe";
+  }
+
 
   static touchDevice() {
     return isTouchDevice();
